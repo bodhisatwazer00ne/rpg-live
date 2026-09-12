@@ -522,8 +522,8 @@ export function subscribeToIncomingChallenges(
       onUpdate(challenges);
     },
     (error) => {
+      console.warn(`Firestore incoming challenges subscription notice:`, error);
       if (onError) onError(error);
-      handleFirestoreError(error, OperationType.LIST, path);
     }
   );
 }
@@ -550,8 +550,8 @@ export function subscribeToOutgoingChallenges(
       onUpdate(challenges);
     },
     (error) => {
+      console.warn(`Firestore outgoing challenges subscription notice:`, error);
       if (onError) onError(error);
-      handleFirestoreError(error, OperationType.LIST, path);
     }
   );
 }
@@ -676,8 +676,8 @@ export function subscribeToActiveBattle(
       }
     },
     (error) => {
+      console.warn(`Firestore active battle subscription notice for ${path}:`, error);
       if (onError) onError(error);
-      handleFirestoreError(error, OperationType.GET, path);
     }
   );
 }
@@ -696,8 +696,8 @@ export async function submitBattleAction(
     if (!snap.exists()) return;
 
     const battle = snap.data() as ActiveBattleSession;
-    const isPlayer1 = battle.player1.id === userId;
-    const isPlayer2 = battle.player2.id === userId;
+    const isPlayer1 = battle.player1?.id === userId;
+    const isPlayer2 = battle.player2?.id === userId;
 
     if (!isPlayer1 && !isPlayer2) return;
 
@@ -739,6 +739,9 @@ export async function resolveSimultaneousRound(
     const act1 = p1.selectedAction.action;
     const act2 = p2.selectedAction.action;
 
+    const p1Attrs = p1.attributes || { str: 10, int: 10, end: 10, res: 10, dis: 10, wil: 10 };
+    const p2Attrs = p2.attributes || { str: 10, int: 10, end: 10, res: 10, dis: 10, wil: 10 };
+
     // Damage calculations
     // P1 -> P2
     let p1Dmg = 0;
@@ -747,22 +750,22 @@ export async function resolveSimultaneousRound(
     let p1Heal = 0;
 
     if (act1 === 'STRIKE') {
-      const baseDmg = Math.max(12, Math.floor((p1.attributes.str * 1.6) + (p1.level * 3)));
-      const mitigation = Math.floor((p2.attributes.res * 0.4));
+      const baseDmg = Math.max(12, Math.floor((p1Attrs.str * 1.6) + ((p1.level || 1) * 3)));
+      const mitigation = Math.floor((p2Attrs.res * 0.4));
       const defFactor = act2 === 'DEFEND' ? 0.35 : 1.0;
-      p1Crit = Math.random() < Math.min(0.35, 0.05 + (p1.attributes.dis * 0.02));
+      p1Crit = Math.random() < Math.min(0.35, 0.05 + (p1Attrs.dis * 0.02));
       const critMultiplier = p1Crit ? 1.5 : 1.0;
       p1Dmg = Math.max(5, Math.floor((baseDmg - mitigation) * defFactor * critMultiplier));
       p1StaminaSpent = 12;
     } else if (act1 === 'FOCUS_SURGE') {
-      const baseDmg = Math.max(16, Math.floor((p1.attributes.str * 2.0) + (p1.attributes.int * 0.8) + (p1.level * 4)));
-      const mitigation = Math.floor((p2.attributes.res * 0.3));
+      const baseDmg = Math.max(16, Math.floor((p1Attrs.str * 2.0) + (p1Attrs.int * 0.8) + ((p1.level || 1) * 4)));
+      const mitigation = Math.floor((p2Attrs.res * 0.3));
       const defFactor = act2 === 'DEFEND' ? 0.45 : 1.0;
       p1Crit = true;
       p1Dmg = Math.max(10, Math.floor((baseDmg - mitigation) * defFactor * 1.4));
       p1StaminaSpent = 24;
     } else if (act1 === 'HEAL_POTION') {
-      p1Heal = Math.min(40, p1.maxHp - p1.hp);
+      p1Heal = Math.min(40, (p1.maxHp || 50) - (p1.hp || 0));
       p1StaminaSpent = 8;
     } else if (act1 === 'DEFEND') {
       p1StaminaSpent = -15; // recovers 15 stamina
@@ -775,34 +778,34 @@ export async function resolveSimultaneousRound(
     let p2Heal = 0;
 
     if (act2 === 'STRIKE') {
-      const baseDmg = Math.max(12, Math.floor((p2.attributes.str * 1.6) + (p2.level * 3)));
-      const mitigation = Math.floor((p1.attributes.res * 0.4));
+      const baseDmg = Math.max(12, Math.floor((p2Attrs.str * 1.6) + ((p2.level || 1) * 3)));
+      const mitigation = Math.floor((p1Attrs.res * 0.4));
       const defFactor = act1 === 'DEFEND' ? 0.35 : 1.0;
-      p2Crit = Math.random() < Math.min(0.35, 0.05 + (p2.attributes.dis * 0.02));
+      p2Crit = Math.random() < Math.min(0.35, 0.05 + (p2Attrs.dis * 0.02));
       const critMultiplier = p2Crit ? 1.5 : 1.0;
       p2Dmg = Math.max(5, Math.floor((baseDmg - mitigation) * defFactor * critMultiplier));
       p2StaminaSpent = 12;
     } else if (act2 === 'FOCUS_SURGE') {
-      const baseDmg = Math.max(16, Math.floor((p2.attributes.str * 2.0) + (p2.attributes.int * 0.8) + (p2.level * 4)));
-      const mitigation = Math.floor((p1.attributes.res * 0.3));
+      const baseDmg = Math.max(16, Math.floor((p2Attrs.str * 2.0) + (p2Attrs.int * 0.8) + ((p2.level || 1) * 4)));
+      const mitigation = Math.floor((p1Attrs.res * 0.3));
       const defFactor = act1 === 'DEFEND' ? 0.45 : 1.0;
       p2Crit = true;
       p2Dmg = Math.max(10, Math.floor((baseDmg - mitigation) * defFactor * 1.4));
       p2StaminaSpent = 24;
     } else if (act2 === 'HEAL_POTION') {
-      p2Heal = Math.min(40, p2.maxHp - p2.hp);
+      p2Heal = Math.min(40, (p2.maxHp || 50) - (p2.hp || 0));
       p2StaminaSpent = 8;
     } else if (act2 === 'DEFEND') {
       p2StaminaSpent = -15;
     }
 
     // Calculate new HPs
-    const newP1Hp = Math.max(0, Math.min(p1.maxHp, p1.hp - p2Dmg + p1Heal));
-    const newP2Hp = Math.max(0, Math.min(p2.maxHp, p2.hp - p1Dmg + p2Heal));
+    const newP1Hp = Math.max(0, Math.min(p1.maxHp || 50, (p1.hp || 0) - p2Dmg + p1Heal));
+    const newP2Hp = Math.max(0, Math.min(p2.maxHp || 50, (p2.hp || 0) - p1Dmg + p2Heal));
 
     // Calculate new Stamina
-    const newP1Stamina = Math.max(0, Math.min(p1.maxStamina, p1.stamina - p1StaminaSpent));
-    const newP2Stamina = Math.max(0, Math.min(p2.maxStamina, p2.stamina - p2StaminaSpent));
+    const newP1Stamina = Math.max(0, Math.min(p1.maxStamina || 50, (p1.stamina || 0) - p1StaminaSpent));
+    const newP2Stamina = Math.max(0, Math.min(p2.maxStamina || 50, (p2.stamina || 0) - p2StaminaSpent));
 
     // Summary line
     const summary = `Round ${battle.round}: ${p1.username} chose ${act1} (dealt ${p1Dmg} dmg) — ${p2.username} chose ${act2} (dealt ${p2Dmg} dmg)!`;

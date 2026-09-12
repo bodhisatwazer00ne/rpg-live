@@ -103,13 +103,20 @@ export const SimultaneousBattleArena: React.FC<SimultaneousBattleArenaProps> = (
     return () => unsubPresence();
   }, [battleId, session?.status, rival?.id]);
 
-  // Determine player and rival roles
-  const isPlayer1 = session?.player1.id === user.id;
-  const myState = isPlayer1 ? session?.player1 : session?.player2;
+  // Determine player and rival roles with complete null-safety
+  const isPlayer1 = session?.player1?.id === user.id;
+  const isPlayer2 = session?.player2?.id === user.id;
+  const myState = isPlayer1
+    ? session?.player1
+    : isPlayer2
+    ? session?.player2
+    : session?.player1;
   const rivalState = isPlayer1 ? session?.player2 : session?.player1;
 
-  const mySelectedAction = myState?.selectedAction?.round === session?.round ? myState.selectedAction.action : null;
-  const rivalSelectedAction = rivalState?.selectedAction?.round === session?.round ? rivalState.selectedAction.action : null;
+  const mySelectedAction =
+    myState?.selectedAction?.round === session?.round ? myState?.selectedAction?.action : null;
+  const rivalSelectedAction =
+    rivalState?.selectedAction?.round === session?.round ? rivalState?.selectedAction?.action : null;
 
   const hasMyAction = !!mySelectedAction;
   const hasRivalAction = !!rivalSelectedAction;
@@ -318,10 +325,10 @@ export const SimultaneousBattleArena: React.FC<SimultaneousBattleArenaProps> = (
           {/* Rival HP Card */}
           <div className="w-full sm:w-64 bg-[#f5eedb] border-4 border-[#120e1d] p-2.5 shadow-[3px_3px_0px_#120e1d]">
             <div className="flex items-center justify-between font-pixel text-xs text-[#181425] mb-1">
-              <span className="font-bold">{rivalState.username}</span>
-              <span className="text-[10px] text-[#2563eb]">LV. {rivalState.level}</span>
+              <span className="font-bold">{rivalState.username || rival?.username || 'Rival Trainer'}</span>
+              <span className="text-[10px] text-[#2563eb]">LV. {rivalState.level || rival?.level || 1}</span>
             </div>
-            <StatBar label="HP" current={rivalState.hp} max={rivalState.maxHp} type="hp" />
+            <StatBar label="HP" current={rivalState.hp ?? rivalState.maxHp ?? 50} max={rivalState.maxHp || 50} type="hp" />
             <div className="mt-1.5 flex items-center justify-between font-silkscreen text-[9px] text-[#554a37]">
               <span>STATUS:</span>
               <span className={hasRivalAction ? 'text-[#15803d] font-bold' : 'text-[#b45309]'}>
@@ -350,7 +357,12 @@ export const SimultaneousBattleArena: React.FC<SimultaneousBattleArenaProps> = (
               </div>
             )}
             <div className="relative w-28 h-28 sm:w-36 sm:h-36 bg-[#2d3a54] border-2 border-[#43557a] flex items-center justify-center p-2 shadow-[inset_2px_2px_0px_#000]">
-              <CharacterSprite id={rivalState.avatarId} level={rivalState.level} size={96} animation={rivalAnimation} />
+              <CharacterSprite
+                id={rivalState.avatarId || rival?.avatarId || 'hero_novice'}
+                level={rivalState.level || rival?.level || 1}
+                size={96}
+                animation={rivalAnimation}
+              />
             </div>
           </div>
         </div>
@@ -378,8 +390,8 @@ export const SimultaneousBattleArena: React.FC<SimultaneousBattleArenaProps> = (
             )}
             <div className="relative w-28 h-28 sm:w-36 sm:h-36 bg-[#2d3a54] border-2 border-[#43557a] flex items-center justify-center p-2 shadow-[inset_2px_2px_0px_#000]">
               <CharacterSprite
-                id={myState.avatarId}
-                level={myState.level}
+                id={myState.avatarId || user?.avatarId || 'hero_novice'}
+                level={myState.level || user?.level || 1}
                 size={96}
                 animation={playerAnimation}
                 flipped={true}
@@ -390,11 +402,11 @@ export const SimultaneousBattleArena: React.FC<SimultaneousBattleArenaProps> = (
           {/* Player HP & Stamina Combat Card */}
           <div className="w-full sm:w-72 bg-[#f5eedb] border-4 border-[#120e1d] p-3 shadow-[3px_3px_0px_#120e1d] space-y-2">
             <div className="flex items-center justify-between font-pixel text-xs text-[#181425]">
-              <span className="font-bold">{myState.username}</span>
-              <span className="text-[10px] text-[#2563eb]">LV. {myState.level}</span>
+              <span className="font-bold">{myState.username || user?.username || 'Trainer'}</span>
+              <span className="text-[10px] text-[#2563eb]">LV. {myState.level || user?.level || 1}</span>
             </div>
-            <StatBar label="HP" current={myState.hp} max={myState.maxHp} type="hp" />
-            <StatBar label="STAMINA" current={myState.stamina} max={myState.maxStamina} type="stamina" />
+            <StatBar label="HP" current={myState.hp ?? user?.hp ?? 50} max={myState.maxHp ?? user?.maxHp ?? 50} type="hp" />
+            <StatBar label="STAMINA" current={myState.stamina ?? user?.stamina ?? 50} max={myState.maxStamina ?? user?.maxStamina ?? 50} type="stamina" />
             <div className="flex items-center justify-between font-silkscreen text-[9px] text-[#554a37] pt-0.5">
               <span>YOUR ACTION:</span>
               <span className={hasMyAction ? 'text-[#15803d] font-bold' : 'text-[#2563eb]'}>

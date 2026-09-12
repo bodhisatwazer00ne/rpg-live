@@ -34,10 +34,9 @@ interface ActiveEffect {
   target: 'player' | 'rival';
 }
 
-export const BattleArenaScreen: React.FC<BattleArenaScreenProps> = ({
+const SinglePlayerBattleArena: React.FC<BattleArenaScreenProps> = ({
   user,
   rival,
-  battleId,
   items,
   inventory,
   onVictory,
@@ -45,22 +44,6 @@ export const BattleArenaScreen: React.FC<BattleArenaScreenProps> = ({
   onRun,
   onUseItemInBattle,
 }) => {
-  // If an active multiplayer battle session ID is provided, delegate to SimultaneousBattleArena
-  if (battleId) {
-    return (
-      <SimultaneousBattleArena
-        user={user}
-        rival={rival}
-        battleId={battleId}
-        items={items}
-        inventory={inventory}
-        onVictory={onVictory}
-        onDefeat={onDefeat}
-        onRun={onRun}
-      />
-    );
-  }
-
   const effective = computeEffectiveAttributes(user, inventory, items);
 
   // Battle dynamic states
@@ -722,4 +705,23 @@ export const BattleArenaScreen: React.FC<BattleArenaScreenProps> = ({
       </div>
     </div>
   );
+};
+
+export const BattleArenaScreen: React.FC<BattleArenaScreenProps> = (props) => {
+  if (props.battleId) {
+    return (
+      <SimultaneousBattleArena
+        user={props.user}
+        rival={props.rival}
+        battleId={props.battleId}
+        items={props.items}
+        inventory={props.inventory}
+        onVictory={props.onVictory}
+        onDefeat={props.onDefeat}
+        onRun={props.onRun}
+      />
+    );
+  }
+
+  return <SinglePlayerBattleArena {...props} />;
 };

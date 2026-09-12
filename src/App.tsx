@@ -38,6 +38,7 @@ import {
 } from './services/firebase';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { AuthModal } from './components/auth/AuthModal';
+import { ErrorBoundary } from './components/common/ErrorBoundary';
 import { AuthHomePage } from './components/auth/AuthHomePage';
 import { ClaimUsernameModal } from './components/auth/ClaimUsernameModal';
 
@@ -432,12 +433,12 @@ function LifeRpgApp() {
 
     let updatedUser = { ...gameState.user };
 
-    if (item.statEffects) {
-      if (item.statEffects.hp) {
-        updatedUser.hp = Math.min(updatedUser.hp + item.statEffects.hp, updatedUser.maxHp);
+    if (item.consumableEffect) {
+      if (item.consumableEffect.hp) {
+        updatedUser.hp = Math.min(updatedUser.hp + item.consumableEffect.hp, updatedUser.maxHp);
       }
-      if (item.statEffects.stamina) {
-        updatedUser.stamina = Math.min(updatedUser.stamina + item.statEffects.stamina, updatedUser.maxStamina);
+      if (item.consumableEffect.stamina) {
+        updatedUser.stamina = Math.min(updatedUser.stamina + item.consumableEffect.stamina, updatedUser.maxStamina);
       }
     }
 
@@ -922,8 +923,10 @@ function LifeRpgApp() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <LifeRpgApp />
-    </AuthProvider>
+    <ErrorBoundary fallbackTitle="LIFE RPG APPLICATION RECOVERY">
+      <AuthProvider>
+        <LifeRpgApp />
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }

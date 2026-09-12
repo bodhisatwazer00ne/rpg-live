@@ -19,20 +19,22 @@ export const CharacterSprite: React.FC<CharacterSpriteProps> = ({
   className = '',
   level = 1,
 }) => {
+  const safeId = typeof id === 'string' && id.trim() ? id.trim() : 'hero_novice';
+
   const isPlayerHero =
-    id.startsWith('hero_') ||
-    id.includes('novice') ||
-    id.includes('warrior') ||
-    id.includes('guardian') ||
-    id.includes('scout') ||
-    id.includes('monk') ||
-    id.includes('scholar') ||
-    id.includes('adventurer') ||
-    id === 'player_hero' ||
-    id === 'warrior_male' ||
-    id === 'mage_female' ||
-    id === 'rogue_male' ||
-    id === 'paladin_female';
+    safeId.startsWith('hero_') ||
+    safeId.includes('novice') ||
+    safeId.includes('warrior') ||
+    safeId.includes('guardian') ||
+    safeId.includes('scout') ||
+    safeId.includes('monk') ||
+    safeId.includes('scholar') ||
+    safeId.includes('adventurer') ||
+    safeId === 'player_hero' ||
+    safeId === 'warrior_male' ||
+    safeId === 'mage_female' ||
+    safeId === 'rogue_male' ||
+    safeId === 'paladin_female';
 
   const getAnimationClass = () => {
     switch (animation) {
@@ -262,7 +264,7 @@ export const CharacterSprite: React.FC<CharacterSpriteProps> = ({
   // Helper to render authentic 16x16 pixel grids using SVG rects
   const renderSpriteSvg = () => {
     // 0. NOVICE / ADVENTURER (Starter Hero)
-    if (id.includes('novice') || id === 'hero_novice' || id === 'hero_adventurer' || id === 'player_hero') {
+    if (safeId.includes('novice') || safeId === 'hero_novice' || safeId === 'hero_adventurer' || safeId === 'player_hero') {
       return (
         <svg viewBox="0 0 24 24" width={size} height={size} className="shape-rendering-crispEdges">
           {/* Hair & Red Adventurer Bandana */}
@@ -294,7 +296,7 @@ export const CharacterSprite: React.FC<CharacterSpriteProps> = ({
     }
 
     // 1. WARRIOR / IRON VANGUARD
-    if (id.includes('warrior') || id === 'hero_warrior' || id === 'warrior_male') {
+    if (safeId.includes('warrior') || safeId === 'hero_warrior' || safeId === 'warrior_male') {
       return (
         <svg viewBox="0 0 24 24" width={size} height={size} className="shape-rendering-crispEdges">
           {/* Helm & Red Plume */}
@@ -327,7 +329,7 @@ export const CharacterSprite: React.FC<CharacterSpriteProps> = ({
     }
 
     // 2. SCHOLAR / ARCANE SAGE
-    if (id.includes('scholar') || id === 'hero_scholar' || id === 'mage_female') {
+    if (safeId.includes('scholar') || safeId === 'hero_scholar' || safeId === 'mage_female') {
       return (
         <svg viewBox="0 0 24 24" width={size} height={size} className="shape-rendering-crispEdges">
           {/* Wizard / Scholar Hood */}
@@ -356,7 +358,7 @@ export const CharacterSprite: React.FC<CharacterSpriteProps> = ({
     }
 
     // 3. SCOUT / SWIFT RANGER
-    if (id.includes('scout') || id === 'hero_scout' || id === 'rogue_male') {
+    if (safeId.includes('scout') || safeId === 'hero_scout' || safeId === 'rogue_male') {
       return (
         <svg viewBox="0 0 24 24" width={size} height={size} className="shape-rendering-crispEdges">
           {/* Green Hood & Mask */}
@@ -384,7 +386,7 @@ export const CharacterSprite: React.FC<CharacterSpriteProps> = ({
     }
 
     // 4. GUARDIAN / STEADFAST PALADIN
-    if (id.includes('guardian') || id === 'hero_guardian' || id === 'paladin_female') {
+    if (safeId.includes('guardian') || safeId === 'hero_guardian' || safeId === 'paladin_female') {
       return (
         <svg viewBox="0 0 24 24" width={size} height={size} className="shape-rendering-crispEdges">
           {/* Golden Crest Halo */}
@@ -408,7 +410,7 @@ export const CharacterSprite: React.FC<CharacterSpriteProps> = ({
     }
 
     // 5. MONK / MINDFUL ASCETIC
-    if (id.includes('monk') || id === 'hero_monk') {
+    if (safeId.includes('monk') || safeId === 'hero_monk') {
       return (
         <svg viewBox="0 0 24 24" width={size} height={size} className="shape-rendering-crispEdges">
           {/* Headband & Shaved Head */}
@@ -437,7 +439,7 @@ export const CharacterSprite: React.FC<CharacterSpriteProps> = ({
     // --- RIVALS / BOSSES (No player level gear attached) ---
 
     // 1. PROCRASTOR THE SLOTH IMP
-    if (id === 'sloth_imp' || id.includes('procrastor')) {
+    if (safeId === 'sloth_imp' || safeId.includes('procrastor')) {
       return (
         <svg viewBox="0 0 24 24" width={size} height={size} className="shape-rendering-crispEdges">
           {/* Droopy Horns */}
@@ -466,7 +468,7 @@ export const CharacterSprite: React.FC<CharacterSpriteProps> = ({
     }
 
     // 2. SIR BURNOUT / OVERSTRESSED KNIGHT
-    if (id === 'burnout_knight' || id.includes('burnout')) {
+    if (safeId === 'burnout_knight' || safeId.includes('burnout')) {
       return (
         <svg viewBox="0 0 24 24" width={size} height={size} className="shape-rendering-crispEdges">
           {/* Smoke / Steam from overheated brain */}
@@ -492,7 +494,7 @@ export const CharacterSprite: React.FC<CharacterSpriteProps> = ({
     }
 
     // 3. PHANTOM OF FEEDS / SCROLL WRAITH
-    if (id === 'scroll_wraith' || id.includes('distraction') || id.includes('scroll')) {
+    if (safeId === 'scroll_wraith' || safeId.includes('distraction') || safeId.includes('scroll')) {
       return (
         <svg viewBox="0 0 24 24" width={size} height={size} className="shape-rendering-crispEdges">
           {/* Floating Dark Hood */}
@@ -514,7 +516,7 @@ export const CharacterSprite: React.FC<CharacterSpriteProps> = ({
     }
 
     // 4. IMPOSTER DRAKE / WYRM OF DOUBT
-    if (id === 'doubt_drake' || id.includes('doubt')) {
+    if (safeId === 'doubt_drake' || safeId.includes('doubt')) {
       return (
         <svg viewBox="0 0 24 24" width={size} height={size} className="shape-rendering-crispEdges">
           {/* Dragon Horns */}
@@ -538,7 +540,7 @@ export const CharacterSprite: React.FC<CharacterSpriteProps> = ({
     }
 
     // 5. GRANDMASTER APEX
-    if (id === 'apex_sovereign' || id.includes('apex')) {
+    if (safeId === 'apex_sovereign' || safeId.includes('apex')) {
       return (
         <svg viewBox="0 0 24 24" width={size} height={size} className="shape-rendering-crispEdges">
           {/* Crown of Sundials & Habit Mastery */}

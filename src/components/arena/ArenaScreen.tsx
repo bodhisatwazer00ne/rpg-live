@@ -4,6 +4,7 @@ import { PixelButton } from '../rpg/PixelButton';
 import { CharacterSprite } from '../rpg/CharacterSprite';
 import { BattleArenaScreen } from '../battle/BattleArenaScreen';
 import { BattleHistoryView } from './BattleHistoryView';
+import { ErrorBoundary } from '../common/ErrorBoundary';
 import { 
   subscribeToPublicTrainers, 
   subscribeToIncomingChallenges, 
@@ -293,30 +294,38 @@ export const ArenaScreen: React.FC<ArenaScreenProps> = ({
           </button>
         </div>
 
-        <BattleArenaScreen
-          user={user}
-          rival={activeBattleRival}
-          battleId={activeBattleId || undefined}
-          items={items}
-          inventory={inventory}
-          onVictory={(rival) => {
-            onVictory(rival);
+        <ErrorBoundary
+          fallbackTitle="COMBAT ARENA RECOVERY"
+          onReset={() => {
             setActiveBattleRival(null);
             setActiveBattleId(null);
           }}
-          onDefeat={(rival) => {
-            onDefeat(rival);
-            setActiveBattleRival(null);
-            setActiveBattleId(null);
-          }}
-          onRun={(rival) => {
-            chiptune.playCursor();
-            if (onRun) onRun(rival);
-            setActiveBattleRival(null);
-            setActiveBattleId(null);
-          }}
-          onUseItemInBattle={onUseItemInBattle}
-        />
+        >
+          <BattleArenaScreen
+            user={user}
+            rival={activeBattleRival}
+            battleId={activeBattleId || undefined}
+            items={items}
+            inventory={inventory}
+            onVictory={(rival) => {
+              onVictory(rival);
+              setActiveBattleRival(null);
+              setActiveBattleId(null);
+            }}
+            onDefeat={(rival) => {
+              onDefeat(rival);
+              setActiveBattleRival(null);
+              setActiveBattleId(null);
+            }}
+            onRun={(rival) => {
+              chiptune.playCursor();
+              if (onRun) onRun(rival);
+              setActiveBattleRival(null);
+              setActiveBattleId(null);
+            }}
+            onUseItemInBattle={onUseItemInBattle}
+          />
+        </ErrorBoundary>
       </div>
     );
   }
