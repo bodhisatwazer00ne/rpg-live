@@ -1,0 +1,121 @@
+{
+  "entities": {
+    "UserGameProfile": {
+      "title": "UserGameProfile",
+      "description": "User profile and RPG game state synchronized across devices",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "email": { "type": "string" },
+        "emailVerified": { "type": "boolean" },
+        "user": { "type": "object" },
+        "inventory": { "type": "array" },
+        "quests": { "type": "array" },
+        "badges": { "type": "array" },
+        "rivals": { "type": "array" },
+        "battleHistory": { "type": "array" },
+        "settings": { "type": "object" },
+        "hasCompletedOnboarding": { "type": "boolean" },
+        "hasClaimedUsername": { "type": "boolean" },
+        "defeatedRivalsCount": { "type": "number" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["userId", "email"]
+    },
+    "UsernameClaim": {
+      "title": "UsernameClaim",
+      "description": "Unique username registry ensuring no duplicates across all accounts",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "username": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["userId", "username"]
+    },
+    "PublicTrainer": {
+      "title": "PublicTrainer",
+      "description": "Public trainer profile visible to other players in arena and leaderboard",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "username": { "type": "string" },
+        "level": { "type": "number" },
+        "title": { "type": "string" },
+        "avatarId": { "type": "string" },
+        "specialization": { "type": "string" },
+        "hp": { "type": "number" },
+        "maxHp": { "type": "number" },
+        "stamina": { "type": "number" },
+        "maxStamina": { "type": "number" },
+        "streak": { "type": "number" },
+        "xp": { "type": "number" },
+        "attributes": { "type": "object" },
+        "equipmentName": { "type": "string" },
+        "questsCleared": { "type": "number" },
+        "defeatedRivalsCount": { "type": "number" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["userId", "username", "level"]
+    },
+    "DuelChallenge": {
+      "title": "DuelChallenge",
+      "description": "Real-world challenge between players in the arena",
+      "type": "object",
+      "properties": {
+        "challengerId": { "type": "string" },
+        "challengerName": { "type": "string" },
+        "challengerAvatarId": { "type": "string" },
+        "challengerLevel": { "type": "number" },
+        "challengerTitle": { "type": "string" },
+        "challengerStats": { "type": "object" },
+        "targetUserId": { "type": "string" },
+        "targetName": { "type": "string" },
+        "status": { "type": "string", "enum": ["PENDING", "ACCEPTED", "DECLINED", "COMPLETED"] },
+        "battleId": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["challengerId", "targetUserId", "status"]
+    },
+    "ActiveBattle": {
+      "title": "ActiveBattle",
+      "description": "Real-time simultaneous multiplayer arena battle between two live online players",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "player1": { "type": "object" },
+        "player2": { "type": "object" },
+        "round": { "type": "number" },
+        "status": { "type": "string", "enum": ["WAITING_FOR_ACCEPT", "IN_PROGRESS", "RESOLVED", "FORFEIT"] },
+        "lastResolution": { "type": "object" },
+        "winnerId": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "player1", "player2", "status"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserGameProfile",
+      "description": "Stores user trainer state and game progress per authenticated user"
+    },
+    "/usernames/{usernameLower}": {
+      "schema": "UsernameClaim",
+      "description": "Global unique username directory"
+    },
+    "/publicTrainers/{userId}": {
+      "schema": "PublicTrainer",
+      "description": "Public directory of real-world players for the arena and leaderboard"
+    },
+    "/challenges/{challengeId}": {
+      "schema": "DuelChallenge",
+      "description": "Arena challenges sent between real players"
+    },
+    "/activeBattles/{battleId}": {
+      "schema": "ActiveBattle",
+      "description": "Real-time simultaneous battle session between two online trainers"
+    }
+  }
+}

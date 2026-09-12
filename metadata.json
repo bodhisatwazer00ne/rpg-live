@@ -1,0 +1,8 @@
+{
+  "name": "Remix Life RPG 4",
+  "description": "Retro handheld RPG where your real-world productivity and personal habits drive character progression, stats, gear, and turn-based battles.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

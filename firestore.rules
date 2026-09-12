@@ -1,0 +1,39 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Connectivity verification path
+    match /test/{testId} {
+      allow read, write: if true;
+    }
+
+    // Secure Trainer Accounts (Email & Password credentials registry)
+    match /trainerAccounts/{accountId} {
+      allow read, write: if true;
+    }
+
+    // User profile & game state persistence
+    match /users/{userId} {
+      allow read, write: if true;
+    }
+
+    // Unique Username Registry
+    match /usernames/{usernameLower} {
+      allow read, write: if true;
+    }
+
+    // Public Trainer directory for real-world players in Arena & Leaderboard
+    match /publicTrainers/{userId} {
+      allow read, write: if true;
+    }
+
+    // Real-time Duel Challenges between online players
+    match /challenges/{challengeId} {
+      allow read, write: if true;
+    }
+
+    // Real-time simultaneous multiplayer arena battles
+    match /activeBattles/{battleId} {
+      allow read, write: if true;
+    }
+  }
+}
